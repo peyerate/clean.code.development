@@ -38,8 +38,8 @@ public class ScoreEvaluatorTest {
 		field.inserTile(4, dot);
 		field.inserTile(5, dot);
 		field.inserTile(6, dot);
-		field.printGameField();
-		Assert.assertEquals(evaluator.evaluateGameStatus(field, cross, dot), cross);
+//		field.printGameField();
+		Assert.assertEquals(evaluator.checkHorizontalLineForFourInARow(field, cross), true);
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class ScoreEvaluatorTest {
 		field.inserTile(4, dot);
 		field.inserTile(5, dot);
 //		field.printGameField();
-		Assert.assertEquals(evaluator.evaluateGameStatus(field, cross, dot), dot);
+		Assert.assertEquals(evaluator.checkHorizontalLineForFourInARow(field, dot), true);
 	}
 	
 	@Test
@@ -75,8 +75,8 @@ public class ScoreEvaluatorTest {
 		field.inserTile(1, dot);
 		field.inserTile(1, dot);
 		field.inserTile(1, dot);
-		
-		Assert.assertEquals(evaluator.evaluateGameStatus(field, cross, dot), cross);
+		field.printGameField();
+		Assert.assertEquals(evaluator.checkVerticalLineForFourInARow(field, cross), true);
 	}
 	
 	@Test
@@ -90,7 +90,50 @@ public class ScoreEvaluatorTest {
 		field.inserTile(1, dot);
 		field.inserTile(1, dot);
 		field.inserTile(1, dot);
-		Assert.assertEquals(evaluator.evaluateGameStatus(field, cross, dot), dot);
+//		field.printGameField();
+		Assert.assertEquals(evaluator.checkVerticalLineForFourInARow(field, dot), true);
+	}
+	
+	@Test
+	public void testIfPlayerCrossHasDiagonalWin() {
+		Player cross = new Player(TileStyle.CROSS.value());
+		Player dot = new Player(TileStyle.DOT.value());
+		field.inserTile(0, cross);
+		field.inserTile(1, dot);
+		field.inserTile(1, cross);
+		field.inserTile(2, dot);
+		field.inserTile(2, dot);
+		field.inserTile(2, cross);
+		field.inserTile(3, cross);
+		field.inserTile(3, dot);
+		field.inserTile(3, cross);
+		field.inserTile(3, cross);
+		field.inserTile(6, dot);
+		field.inserTile(6, dot);
+		field.inserTile(6, dot);
+		field.printGameField();
+		Assert.assertEquals(evaluator.checkDiagonalLineForFourInARow(field, cross), true);
+	}
+	
+	@Test
+	public void testIfPlayerDotHasDiagonalWin() {
+		Player cross = new Player(TileStyle.CROSS.value());
+		Player dot = new Player(TileStyle.DOT.value());
+		field.inserTile(0, dot);
+		field.inserTile(1, cross);
+		field.inserTile(1, dot);
+		field.inserTile(2, cross);
+		field.inserTile(2, cross);
+		field.inserTile(2, dot);
+		field.inserTile(3, dot);
+		field.inserTile(3, cross);
+		field.inserTile(3, dot);
+		field.inserTile(3, dot);
+		field.inserTile(6, cross);
+		field.inserTile(6, cross);
+		field.inserTile(6, cross);
+		field.printGameField();
+		Assert.assertEquals(evaluator.checkDiagonalLineForFourInARow(field, cross), true);
 	}
 	
 	@Test
@@ -100,7 +143,7 @@ public class ScoreEvaluatorTest {
 		list.add(11);
 		list.add(12);
 		list.add(10);
-		Assert.assertEquals(evaluator.checkIfFourNumbersAtLeastAreConsecutiveAccending(list), true);
+		Assert.assertEquals(evaluator.checkIfFourNumbersAtLeastAreConsecutiveAscending(list), true);
 	}
 	
 	@Test
@@ -110,7 +153,7 @@ public class ScoreEvaluatorTest {
 		list.add(10);
 		list.add(14);
 		list.add(13);
-		Assert.assertEquals(evaluator.checkIfFourNumbersAtLeastAreConsecutiveAccending(list), false);
+		Assert.assertEquals(evaluator.checkIfFourNumbersAtLeastAreConsecutiveAscending(list), false);
 	}
 	
 	@Test
@@ -118,6 +161,6 @@ public class ScoreEvaluatorTest {
 		List<Integer> list = new ArrayList<>();
 		list.add(11);
 		list.add(12);
-		Assert.assertEquals(evaluator.checkIfFourNumbersAtLeastAreConsecutiveAccending(list), false);
+		Assert.assertEquals(evaluator.checkIfFourNumbersAtLeastAreConsecutiveAscending(list), false);
 	}
 }
