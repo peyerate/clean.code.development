@@ -2,9 +2,11 @@ package clean.code.development.connect.four.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class ScoreEvaluator {
@@ -39,7 +41,7 @@ public class ScoreEvaluator {
 	}
 
 	public boolean checkHorizontalLineForFourInARow(Grid grid, Player player) {
-		Map<Integer, List<Integer>> result = createResultList(grid, player);
+		Map<Integer, List<Integer>> result = createResultMap(grid, player);
 		for (Map.Entry<Integer, List<Integer>> list : result.entrySet()) {
 			if (checkIfFourNumbersAtLeastAreConsecutiveAscending(list.getValue())) {
 				return true;
@@ -55,12 +57,8 @@ public class ScoreEvaluator {
 			for (int j = 0; j < grid.getHeight(); j++) {
 				if (grid.getData().get(j).get(i).equals(player.getTile())) {
 					counter++;
-				} else if (j > 0) {
-					if (grid.getData().get(j - 1).get(i).equals(player.getTile())) {
-						counter++;
-					} else {
-						counter = 0;
-					}
+				} else {
+					counter = 0;
 				}
 				if (counter >= 4) {
 					return true;
@@ -71,28 +69,52 @@ public class ScoreEvaluator {
 	}
 
 	public boolean checkDiagonalLineForFourInARow(Grid grid, Player player) {
-		List<Integer> keyList = createResultList(grid, player).keySet().stream().collect(Collectors.toList());
-		if(checkIfFourNumbersAtLeastAreConsecutiveAscending(keyList)) {
-			
-			
-			
-			return true;
-		} else {
+		Map<Integer, List<Integer>> resultMap = createResultMap(grid, player);
+
+		List<Integer> test = resultMap.keySet().stream().collect(Collectors.toList());
+		if (!checkIfFourNumbersAtLeastAreConsecutiveAscending(test)) {
 			return false;
 		}
+		for (Entry<Integer, List<Integer>> entry : resultMap.entrySet()) {
+			if (diagonalLine(resultMap, entry, 1)) {
+				return true; // diagonal win from upper left to down right
+			} else if (diagonalLine(resultMap, entry, -1)) {
+				return true; // diagonal win from upper right to down left
+			}
+
+		}
+		return false;
+	}
+
+	public boolean diagonalLine(Map<Integer, List<Integer>> resultMap, Entry<Integer, List<Integer>> entry,
+			int operation) {
+		for (Integer value : entry.getValue()) {
+			int counter = 1;
+			int tmpvalue = value;
+			for (int i = entry.getKey(); i <= resultMap.keySet().stream().max(Comparator.naturalOrder()).get(); i++) {
+				if (resultMap.get(i).contains(tmpvalue + operation)) {
+					tmpvalue = tmpvalue + operation;
+					counter++;
+				} else {
+					counter = 1;
+				}
+				if (counter >= 4) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
-	 * Creates a map with all placed tiles of a specific player.
-	 * Example:
-	 * 4 = [1,2,3,4]
-	 * 5 = [2,3]
+	 * Creates a map with all placed tiles of a specific player. Example: row =
+	 * [columns] 4 = [1,2,3,4] 5 = [2,3]
 	 * 
 	 * @param grid
 	 * @param player
 	 * @return
 	 */
-	public Map<Integer, List<Integer>> createResultList(Grid grid, Player player) {
+	public Map<Integer, List<Integer>> createResultMap(Grid grid, Player player) {
 		Map<Integer, List<Integer>> results = new HashMap<>();
 		for (int i = 0; i < grid.getData().size(); i++) {
 			for (int j = 0; j < grid.getData().get(i).size(); j++) {
@@ -112,10 +134,9 @@ public class ScoreEvaluator {
 	}
 
 	/**
-	 * Checks if the entries of a list are consecutive ascending.
-	 * Example:
-	 * [1,2,3,5,6,7,8] => true
-	 * [1,2,3,5,6,7] => false
+	 * Checks if the entries of a list are consecutive ascending. Example:
+	 * [1,2,3,5,6,7,8] => true [1,2,3,5,6,7] => false
+	 * 
 	 * @param list
 	 * @return
 	 */
@@ -139,21 +160,4 @@ public class ScoreEvaluator {
 		return counter >= 4;
 	}
 
-	public boolean checkIfFourNumberAtLeastAreConnsecutiveEqual(List<Integer> list) {
-		int counter = 0;
-		for (int i = 0; i < list.size(); i++) {
-			if (i == 0) {
-				counter++;
-			} else if (i > 0) {
-				Integer previousValue = list.get(i - 1);
-				Integer currentValue = list.get(i);
-				if (previousValue == currentValue) {
-					counter++;
-				} else {
-					counter = 0;
-				}
-			}
-		}
-		return counter >= 4;
-	}
 }
