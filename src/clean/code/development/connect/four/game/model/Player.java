@@ -1,9 +1,10 @@
-package clean.code.development.connect.four.game;
+package clean.code.development.connect.four.game.model;
 
 public class Player {
 
 	public enum TileStyle {
 		CROSS("[X]"), DOT("[O]");
+		
 		String tile;
 		
 		TileStyle(String tile) {

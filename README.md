@@ -1,4 +1,2 @@
 # clean.code.development
-This repository is for a ccd example
-
-- First commit
+This is an implementation of the well known game connect four

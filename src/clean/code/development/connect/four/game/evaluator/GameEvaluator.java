@@ -1,4 +1,4 @@
-package clean.code.development.connect.four.game;
+package clean.code.development.connect.four.game.evaluator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,39 +7,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ScoreEvaluator {
+import clean.code.development.connect.four.game.model.Grid;
+import clean.code.development.connect.four.game.model.Player;
+
+public class GameEvaluator {
 
 	/**
 	 * This method checks if there is currently a winning player. That means
-	 * player cross or dot must have four tiles in a row, stacked, or diagonal.
+	 * player cross or dot must have four tiles in a vertical, horizontal, or
+	 * diagonal row.
 	 * 
-	 * @param field
+	 * @param grid
 	 * @param cross
 	 * @param dot
 	 */
-	public Player evaluateGameStatus(Grid grid, Player cross, Player dot) {
-		if (checkHorizontalLineForFourInARow(grid, cross)) {
-			return cross;
-		} else if (checkHorizontalLineForFourInARow(grid, dot)) {
-			return dot;
+	public Player evaluateGameStatus(Grid grid, Player player) {
+
+		if (checkHorizontalLineForFourInARow(grid, player) || checkVerticalLineForFourInARow(grid, player)
+				|| checkDiagonalLineForFourInARow(grid, player)) {
+			return player;
+		} else {
+			return null;
 		}
 
-		if (checkVerticalLineForFourInARow(grid, cross)) {
-			return cross;
-		} else if (checkVerticalLineForFourInARow(grid, dot)) {
-			return dot;
-		}
-
-		if (checkDiagonalLineForFourInARow(grid, cross)) {
-			return cross;
-		} else if (checkVerticalLineForFourInARow(grid, dot)) {
-			return dot;
-		}
-		return null;
 	}
 
+	/**
+	 * Checks if there are four tiles in a horizontal row for a specific player.
+	 * 
+	 * @param grid
+	 * @param player
+	 * @return
+	 */
 	public boolean checkHorizontalLineForFourInARow(Grid grid, Player player) {
 		Map<Integer, List<Integer>> result = createResultMap(grid, player);
 		for (Map.Entry<Integer, List<Integer>> list : result.entrySet()) {
@@ -51,6 +53,13 @@ public class ScoreEvaluator {
 
 	}
 
+	/**
+	 * Checks if there are four tiles in a vertical row for a specific player.
+	 * 
+	 * @param grid
+	 * @param player
+	 * @return
+	 */
 	public boolean checkVerticalLineForFourInARow(Grid grid, Player player) {
 		for (int i = 0; i < grid.getWidth(); i++) {
 			Integer counter = 0;
@@ -68,6 +77,13 @@ public class ScoreEvaluator {
 		return false;
 	}
 
+	/**
+	 * This method uses diagonalLine() for both diagonal checks.
+	 * 
+	 * @param grid
+	 * @param player
+	 * @return
+	 */
 	public boolean checkDiagonalLineForFourInARow(Grid grid, Player player) {
 		Map<Integer, List<Integer>> resultMap = createResultMap(grid, player);
 
@@ -76,30 +92,45 @@ public class ScoreEvaluator {
 			return false;
 		}
 		for (Entry<Integer, List<Integer>> entry : resultMap.entrySet()) {
-			if (diagonalLine(resultMap, entry, 1)) {
-				return true; // diagonal win from upper left to down right
-			} else if (diagonalLine(resultMap, entry, -1)) {
-				return true; // diagonal win from upper right to down left
+			boolean leftRight = diagonalLine(resultMap, entry, 1);
+			boolean rightLeft = diagonalLine(resultMap, entry, -1);
+			if (leftRight || rightLeft) {
+				return true;
 			}
 
 		}
 		return false;
 	}
 
+	/**
+	 * This method checks if there are four tiles in a diagonally row Notice
+	 * that the parameter operation could be 1 or -1, because 1 indicates a
+	 * diagonal check from upper left to down right and -1 indicates a diagonal
+	 * check from upper right to down left.
+	 * 
+	 * @param resultMap
+	 * @param entry
+	 * @param operation
+	 *            could be 1 or -1
+	 * @return
+	 */
 	public boolean diagonalLine(Map<Integer, List<Integer>> resultMap, Entry<Integer, List<Integer>> entry,
 			int operation) {
 		for (Integer value : entry.getValue()) {
 			int counter = 1;
 			int tmpvalue = value;
-			for (int i = entry.getKey(); i <= resultMap.keySet().stream().max(Comparator.naturalOrder()).get(); i++) {
-				if (resultMap.get(i).contains(tmpvalue + operation)) {
-					tmpvalue = tmpvalue + operation;
-					counter++;
-				} else {
-					counter = 1;
-				}
-				if (counter >= 4) {
-					return true;
+			Optional<Integer> maxHeight = resultMap.keySet().stream().max(Comparator.naturalOrder());
+			if (maxHeight.isPresent()) {
+				for (int i = entry.getKey(); i <= maxHeight.get(); i++) {
+					if (resultMap.get(i).contains(tmpvalue + operation)) {
+						tmpvalue = tmpvalue + operation;
+						counter++;
+					} else {
+						counter = 1;
+					}
+					if (counter >= 4) {
+						return true;
+					}
 				}
 			}
 		}
