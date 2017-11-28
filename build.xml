@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<project name="Clean Code Development" default="main" basedir=".">
+    <!-- Sets variables which can later be used. -->
+    <!-- The value of a property is accessed via ${} -->
+    <property name="src.dir" location="." />
+
+    <property name="build.dir" location="build" />
+
+    <!-- Variables used for JUnit testin -->
+    <property name="test.dir" location="." />
+    <property name="test.report.dir" location="testreport" />
+
+    <!-- Define the classpath which includes the junit.jar and the classes after compiling-->
+    <path id="junit.class.path">
+        <pathelement location="/Users/maltewestendorf/.gradle/caches/modules-2/files-2.1/junit/junit/4.4/8f35ee1f35d2dadbb5029991449ee90c1bab4d4a/junit-4.4.jar" />
+        <pathelement location="/Users/maltewestendorf/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-all/1.8.4/5c97d8b6e715ed941aeb93d6fc401ab3eb18a566/mockito-all-1.8.4.jar" />
+    	<pathelement location="${build.dir}" />
+    </path>
+
+
+    <!-- Deletes the existing build, docs and dist directory-->
+    <target name="clean">
+        <delete dir="${build.dir}" />
+        <delete dir="${test.report.dir}" />
+    </target>
+
+    <!-- Creates the  build, docs and dist directory-->
+    <target name="makedir">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${test.report.dir}" />
+    </target>
+
+    <!-- Compiles the java code (including the usage of library for JUnit -->
+    <target name="compile" depends="clean, makedir">
+        <javac srcdir="${src.dir}" destdir="${build.dir}">
+            <classpath refid="junit.class.path" />
+        </javac>
+
+    </target>
+
+    <!-- Run the JUnit Tests -->
+    <!-- Output is XML, could also be plain-->
+    <target name="junit" depends="compile">
+        <junit printsummary="on" fork="true" haltonfailure="yes">
+            <classpath refid="junit.class.path" />
+            <formatter type="xml" />
+            <batchtest todir="${test.report.dir}">
+                <fileset dir="${src.dir}">
+                    <include name="**/*Test*.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="main" depends="compile, junit">
+        <description>Main target</description>
+    </target>
+
+</project>

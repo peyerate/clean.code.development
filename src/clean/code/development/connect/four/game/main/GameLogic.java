@@ -17,8 +17,8 @@ public class GameLogic {
 		//Setup start
 		GameEvaluator evaluator = new GameEvaluator();
 		Grid grid = new Grid();
-		grid.setHeight(16);
-		grid.setWidth(17);
+		grid.setHeight(6);
+		grid.setWidth(7);
 		grid.generateGrid();
 		Player cross = new Player(TileStyle.CROSS.value());
 		Player dot = new Player(TileStyle.DOT.value());

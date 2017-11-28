@@ -41,13 +41,14 @@ apply plugin: 'org.sonarqube'
 
 sonarqube {
   properties {
-  	property "sonar.host.url", ""
-  	property "sonar.login", ""
-  	property "sonar.password", ""
+  	property "sonar.host.url", "http://localhost:9000"
+  	property "sonar.login", "admin"
+  	property "sonar.password", "admin"
  	property "sonar.projectVersion", "1.0"
     property "sonar.projectName", "clean code development"
     property "sonar.projectKey", "ccd"
     property "sonar.java.binaries", "bin"
     property "sonar.sources", "src"
+    property "sonar.tests", "test"
   }
 }
